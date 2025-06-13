@@ -2,8 +2,8 @@
 # coding: utf-8
 
 
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTextEdit, QFileDialog
-from function import function, function2
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QLineEdit, QTextEdit, QFileDialog
+from PyQt5.QtGui import QPalette, QColor
 from LogRegressionDetailed_24Bus_24Period00 import *
 import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -36,52 +36,66 @@ class MyWindow(QWidget):
         self.initUI()
 
     def initUI(self):
-        layout = QVBoxLayout()
+        # 设置Darcula风格
+        self.set_darcula_style()
         
-        # 文本显示框
+        # 使用水平布局
+        main_layout = QHBoxLayout()
+        
+        # 左侧文本显示框
+        left_widget = QWidget()
+        left_layout = QVBoxLayout()
         self.text_display = QTextEdit()
         self.text_display.setReadOnly(True)
-        layout.addWidget(self.text_display)
+        left_layout.addWidget(self.text_display)
+        left_widget.setLayout(left_layout)
+        main_layout.addWidget(left_widget)
+        
+        # 右侧按钮区域
+        right_widget = QWidget()
+        right_layout = QVBoxLayout()
         
         # 打开文件按钮
         btn_open_file = QPushButton('选择训练数据', self)
         btn_open_file.clicked.connect(self.open_train_file)
-        layout.addWidget(btn_open_file)
+        right_layout.addWidget(btn_open_file)
 
          # 打开文件按钮
         btn_open_file2 = QPushButton('选择验证数据', self)
         btn_open_file2.clicked.connect(self.open_test_file)
-        layout.addWidget(btn_open_file2)
+        right_layout.addWidget(btn_open_file2)
 
         # 参数输入框
         self.batch_size_input = QLineEdit()
         self.batch_size_input.setPlaceholderText('输入batch size (默认:64)')
-        layout.addWidget(self.batch_size_input)
+        right_layout.addWidget(self.batch_size_input)
         
         self.epoch_input = QLineEdit()
         self.epoch_input.setPlaceholderText('输入epoch数 (默认:50)')
-        layout.addWidget(self.epoch_input)
+        right_layout.addWidget(self.epoch_input)
         
         # 开始训练按钮
         btn_train = QPushButton('开始训练', self)
         btn_train.clicked.connect(self.train)
-        layout.addWidget(btn_train)
+        right_layout.addWidget(btn_train)
 
         # 加载模型按钮
         btn_load = QPushButton('加载模型', self)
         btn_load.clicked.connect(self.load_model)
-        layout.addWidget(btn_load)
+        right_layout.addWidget(btn_load)
 
         btn_open_data = QPushButton('选择输入数据', self)
         btn_open_data.clicked.connect(self.open_data_file)
-        layout.addWidget(btn_open_data)
+        right_layout.addWidget(btn_open_data)
 
         btn_predict = QPushButton('运行预测', self)
         btn_predict.clicked.connect(self.predict)
-        layout.addWidget(btn_predict)
+        right_layout.addWidget(btn_predict)
         
+        right_widget.setLayout(right_layout)
+        main_layout.addWidget(right_widget)
         
-        self.setLayout(layout)
+        self.setLayout(main_layout)
         self.setWindowTitle('SCUC')
         self.setGeometry(300, 300, 800, 500)
     
@@ -183,6 +197,45 @@ class MyWindow(QWidget):
     def log_message(self, message):
         self.text_display.append(message)
         QApplication.processEvents()  # 实时更新UI
+        
+    def set_darcula_style(self):
+        # 设置Darcula风格配色
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(43, 43, 43))
+        palette.setColor(QPalette.WindowText, QColor(187, 187, 187))
+        palette.setColor(QPalette.Base, QColor(60, 60, 60))
+        palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+        palette.setColor(QPalette.ToolTipBase, QColor(187, 187, 187))
+        palette.setColor(QPalette.ToolTipText, QColor(187, 187, 187))
+        palette.setColor(QPalette.Text, QColor(187, 187, 187))
+        palette.setColor(QPalette.Button, QColor(60, 60, 60))
+        palette.setColor(QPalette.ButtonText, QColor(200, 200, 200))
+        palette.setColor(QPalette.BrightText, QColor(255, 0, 0))
+        palette.setColor(QPalette.Highlight, QColor(75, 110, 175))
+        palette.setColor(QPalette.HighlightedText, QColor(255, 255, 255))
+        
+        self.setPalette(palette)
+        self.setStyleSheet("""
+            QTextEdit {
+                background-color: #323232;
+                color: #bababa;
+                border: 1px solid #3c3f41;
+            }
+            QPushButton {
+                background-color: #535353;
+                color: #bababa;
+                border: 1px solid #3c3f41;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: #656565;
+            }
+            QLineEdit {
+                background-color: #323232;
+                color: #bababa;
+                border: 1px solid #3c3f41;
+            }
+        """)
 
 if __name__ == '__main__':
     app = QApplication([])
